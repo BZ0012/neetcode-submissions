@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>🎉 Deployed!</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at center, #1a1a2e, #0a0a0a);
+      font-family: system-ui, -apple-system, sans-serif;
+      color: #fff;
+      overflow: hidden;
+    }
+    canvas { position: fixed; inset: 0; pointer-events: none; }
+    .card { text-align: center; z-index: 1; padding: 20px; animation: pop 0.8s ease-out; }
+    .emoji { font-size: 72px; animation: bounce 1.5s infinite; }
+    h1 {
+      font-size: clamp(28px, 6vw, 56px);
+      margin: 16px 0 8px;
+      background: linear-gradient(90deg, #00f5a0, #00d9f5, #a855f7);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    p { color: #aaa; font-size: 18px; }
+    button {
+      margin-top: 24px;
+      padding: 12px 28px;
+      font-size: 16px;
+      border: none;
+      border-radius: 999px;
+      background: #fff;
+      color: #000;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    button:hover { transform: scale(1.05); }
+    @keyframes pop { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    @keyframes bounce { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+  </style>
+</head>
+<body>
+  <canvas id="confetti"></canvas>
+  <div class="card">
+    <div class="emoji">🎉</div>
+    <h1>Your Portfolio is Deployed!</h1>
+    <p>Vercel is working. Now build something awesome 🚀</p>
+    <button onclick="burst()">Celebrate Again</button>
+  </div>
+
+  <script>
+    const canvas = document.getElementById("confetti");
+    const ctx = canvas.getContext("2d");
+    let pieces = [];
+    const colors = ["#00f5a0", "#00d9f5", "#a855f7", "#f43f5e", "#facc15", "#fff"];
+
+    function resize() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener("resize", resize);
+    resize();
+
+    function burst() {
+      for (let i = 0; i < 200; i++) {
+        pieces.push({
+          x: canvas.width / 2,
+          y: canvas.height / 2,
+          vx: (Math.random() - 0.5) * 20,
+          vy: Math.random() * -18 - 4,
+          size: Math.random() * 8 + 4,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          rot: Math.random() * 360,
+          spin: (Math.random() - 0.5) * 12,
+          life: 200
+        });
+      }
+    }
+
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      pieces.forEach(p => {
+        p.vy += 0.4;
+        p.vx *= 0.99;
+        p.x += p.vx;
+        p.y += p.vy;
+        p.rot += p.spin;
+        p.life--;
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rot * Math.PI / 180);
+        ctx.fillStyle = p.color;
+        ctx.fillRect(-p.size / 2, -p.size / 4, p.size, p.size / 2);
+        ctx.restore();
+      });
+      pieces = pieces.filter(p => p.life > 0 && p.y < canvas.height + 50);
+      requestAnimationFrame(animate);
+    }
+
+    animate();
+    burst();
+    setTimeout(burst, 600);
+  </script>
+</body>
+</html>
